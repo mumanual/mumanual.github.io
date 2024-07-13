@@ -1,7 +1,7 @@
 
 $\mu-manual$, the minimum practical guide to use 3rd-part libraries.   
 
-1. [Layui](./layui/README.md)
+1. [Lit](./front-end/lit/README.md) basics;  
 
 
 ### Others  
