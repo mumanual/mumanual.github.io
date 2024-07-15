@@ -31,6 +31,10 @@ class MyElement extends LitElement {
     clicked(event) {
         this.timer += 1;
         this.message = `${event.target.nodeName} was clicked ${this.timer} times`;
+        
+        // you can not get slot content in constructor!
+        const slot = this.renderRoot?.querySelector('slot');
+        console.log(slot.assignedNodes());
     }
 
 

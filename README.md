@@ -2,6 +2,7 @@
 $\mu-manual$, the minimum practical guide to use 3rd-part libraries.   
 
 1. [Lit](./front-end/lit/README.md) basics;  
+2. [HTML 布局](./front-end/layout.md)
 
 
 ### Others  
