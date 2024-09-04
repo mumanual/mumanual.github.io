@@ -7,6 +7,7 @@ $\mu-manual$, the minimum practical guide to use 3rd-part libraries.
 
 ### Others  
 1. [mirror 3 or more monitors](./others/mirror-3-or-more-monitors.md)  
+2. [gettext](./others/gettext.md)  
 
 
 -----  
