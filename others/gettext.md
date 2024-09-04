@@ -70,19 +70,19 @@ find . -iname "*.php" | xargs xgettext --from-code=UTF-8 --default-domain=projec
 通过正则表达式获取`DOM` 元素中的`textContent`，并进行替换以达到自动翻译的结果。  
 ```html
 <!DOCTYPE html>
-{% set lang = user_info?.lang ?? 'ja-JP' %}
-<!-- <html lang="{% lang ?? 'zh-CN'%}"> -->
-<html lang="{% lang %}">
+{{ set lang = user_info?.lang ?? 'ja-JP' }}
+<!-- <html lang="{{ lang ?? 'zh-CN'}}"> -->
+<html lang="{{ lang}}">
 
 <head>
     <meta charset="utf-8">
     <title>
-        {%block 'title'%}
+        {{block 'title'}}
         _("网站标题")
-        {%/block%}
+        {{/block}}
     </title>
     <script src="/static/js/gettext.iife.min.js"></script>
-    <script src="/static/i18n/{%lang%}.js"></script>  <!-- 语言资源文件 -->
+    <script src="/static/i18n/{{lang}}.js"></script>  <!-- 语言资源文件 -->
     <script src="/static/js/i18n.js"></script>
 </head>
 ```
