@@ -65,9 +65,103 @@ find . -iname "*.php" | xargs xgettext --from-code=UTF-8 --default-domain=projec
 
 如果软件有更新，可以重新生成`.pot` 文件，在`poedit` 中选择`翻译->从POT 文件更新`。即可选择更新的内容进行翻译，而不用重新来过。  
 
+## art-template   
+可以在`session` 中存储`lang` 信息，并且根据`lang` 去引用翻译的资源文件，以达到国际化的目的。用到的工具有[gettext.js](https://github.com/guillaumepotier/gettext.js) 和其中的`po2json` 工具。  
+通过正则表达式获取`DOM` 元素中的`textContent`，并进行替换以达到自动翻译的结果。  
+```html
+<!DOCTYPE html>
+{% set lang = user_info?.lang ?? 'ja-JP' %}
+<!-- <html lang="{% lang ?? 'zh-CN'%}"> -->
+<html lang="{% lang %}">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        {%block 'title'%}
+        _("网站标题")
+        {%/block%}
+    </title>
+    <script src="/static/js/gettext.iife.min.js"></script>
+    <script src="/static/i18n/{%lang%}.js"></script>  <!-- 语言资源文件 -->
+    <script src="/static/js/i18n.js"></script>
+</head>
+```
+下面时`i18n.js` 的内容：  
+```js
+const _i18n = window.i18n()
+_i18n.loadJSON(po_json)
+
+// _() 函数在js 中也可以直接使用
+function _(msgid, ...args) {
+    return _i18n.gettext(msgid, ...args)
+}
+
+function walk(node) {
+    var child, next;
+    if (node.tagName === 'SCRIPT') {
+        // 不翻译普通js 标签
+        const node_type = node.getAttribute('type') ?? 'text/javascript'
+        if (node_type === 'text/javascript') {
+            return
+        }
+    }
+
+    switch (node.nodeType) {
+        case 1: // Element
+        case 9: // Document
+        case 11: // Document fragment
+            child = node.firstChild;
+            while (child) {
+                next = child.nextSibling;
+                walk(child);
+                child = next;
+            }
+            break;
+        case 3: // Text node                
+            handleText(node);
+            break;
+    }
+}
+
+function handleText(textNode) {
+    var text = textNode.nodeValue;
+    // 匹配_("*") 函数字样
+    var regex = /_\(\"((?:[^"]|\\")*)\"\)/g;
+    // 替换内容
+    var newText = text.replace(regex, function (match, p1) {
+        return _(p1  // 处理转义字符
+            .replace(/\\n/g, '\n')   // \n 
+            .replace(/\\t/g, '\t')   // \t 
+            .replace(/\\"/g, '"')    // \"
+            .replace(/\\\\/g, '\\')  // \\ 
+            .replace(/\\r/g, '\r')   // \r
+            .replace(/\\f/g, '\f')  // \f 
+        )
+    });
+    if (newText !== text) {
+        textNode.nodeValue = newText;
+    }
+}
+
+// 在所有页面元素加载完毕后会触发，但之后页面变化时不会重复触发
+document.addEventListener('DOMContentLoaded', function () {
+    walk(document.head)
+    walk(document.body)
+});        
+```
+
+语言资源文件的结构如下，如果使用`po2json` 的话需要稍微魔改一下：  
+```js
+const po_json = {"msgid":msgstr","":{"language":"ja_JP","plural-forms":"nplurals=2; plural=n>1;"}}
+```
+
+但是以上做法有一个太完美的地方，就是仅能修改`textContent` 中的内容，不能修改元素的`Attribute`。  
+
+刚开始时打算使用`es6 module` 的方式引入，但是对脚本加载的顺序掌握的不牢固，所以还是改成了老式的风格。但是呢，后来发现，不管怎么引用，我只要定义一个`module` 放在最后就好了。
 
 -----   
 
 12Tall 2024-08-20  
+12Tall 2024-09-04 更新art-template  
 
 <script async src="/js/main.js"></script>
