@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
 const po_json = {"msgid":msgstr","":{"language":"ja_JP","plural-forms":"nplurals=2; plural=n>1;"}}
 ```
 
-但是以上做法有一个太完美的地方，就是仅能修改`textContent` 中的内容，不能修改元素的`Attribute`。  
+但是以上做法有一个太完美的地方，就是仅能修改`textContent` 中的内容，不能修改元素的`Attribute`，需要借助`jQuery`等工具/ 
 
 刚开始时打算使用`es6 module` 的方式引入，但是对脚本加载的顺序掌握的不牢固，所以还是改成了老式的风格。但是呢，后来发现，不管怎么引用，我只要定义一个`module` 放在最后就好了。
 
