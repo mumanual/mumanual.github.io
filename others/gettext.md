@@ -125,23 +125,31 @@ function walk(node) {
 
 function handleText(textNode) {
     var text = textNode.nodeValue;
-    // 匹配_("*") 函数字样
-    var regex = /_\(\"((?:[^"]|\\")*)\"\)/g;
+    // 匹配_("*", "*") 函数字样
+    const regex_tr = /_\(\s*((?:"((?:\\.|[^"\\])*)")\s*(?:,\s*)?)+\s*\)/g;
+
+    let match;
+    let tr_string = ''
+    while ((match = regex_tr.exec(text)) !== null) {
+        // match[0] 是整个匹配的字符串
+        // 提取参数
+        const params = [];
+        // 处理转义字符
+        const innerRegex = /"((?:\\.|[^"\\])*)"/g;
+        let paramMatch;
+        while ((paramMatch = innerRegex.exec(match[0])) !== null) {
+            params.push(paramMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+        }
+        tr_string = _(...params)
+    }
+
     // 替换内容
-    var newText = text.replace(regex, function (match, p1) {
-        return _(p1  // 处理转义字符
-            .replace(/\\n/g, '\n')   // \n 
-            .replace(/\\t/g, '\t')   // \t 
-            .replace(/\\"/g, '"')    // \"
-            .replace(/\\\\/g, '\\')  // \\ 
-            .replace(/\\r/g, '\r')   // \r
-            .replace(/\\f/g, '\f')  // \f 
-        )
-    });
+    var newText = text.replace(regex_tr, tr_string);
     if (newText !== text) {
         textNode.nodeValue = newText;
     }
 }
+
 
 // 在所有页面元素加载完毕后会触发，但之后页面变化时不会重复触发
 document.addEventListener('DOMContentLoaded', function () {
